@@ -4,16 +4,18 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppDataSource } from './data-source';
 import { AuthorModule } from './modules/author/author.module';
+import { GenreModule } from './modules/genre/genre.module';
 @Module({
     imports: [
     TypeOrmModule.forRoot({
       ...AppDataSource.options, 
     }),
-    AuthorModule
+    AuthorModule,
+    GenreModule
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
-
+export class AppModule {
+}
 
