@@ -1,11 +1,12 @@
 import { Module } from "@nestjs/common";
-import { AuhtorController } from "./author.controller";
+import { AuthorController } from "./author.controller";
 import { AuthorService } from "./author.service";
 import { TypeOrmModule} from "@nestjs/typeorm";
 import { Author } from './entities/author.entity';
 @Module({
     imports:[TypeOrmModule.forFeature([Author])],
-    controllers:[AuhtorController],
+    controllers:[AuthorController],
     providers:[AuthorService],
 })
 export class AuthorModule{};
+
