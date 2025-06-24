@@ -1,17 +1,17 @@
-import { Book } from "@/modules/book/entities/book.entity";
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Book } from '@/modules/book/entities/book.entity';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Genre{
-    @PrimaryGeneratedColumn()
-    id:number;
+export class Genre {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    name:string;
+  @Column()
+  name: string;
 
-    @Column()
-    url:string;
+  @Column()
+  url: string;
 
-    @ManyToMany(() =>Book, (book)=>book.genres)
-    books:Book[]
+  @ManyToMany(() => Book, (book) => book.genres, { nullable: true })
+  books?: Book[];
 }

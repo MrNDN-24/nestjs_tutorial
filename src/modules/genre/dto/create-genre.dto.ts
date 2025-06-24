@@ -1,13 +1,17 @@
-import { IsString, IsNotEmpty, Length, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, Length, IsOptional , IsUrl} from 'class-validator';
+import {
+  GENRE_NAME_MIN_LENGTH,
+  GENRE_NAME_MAX_LENGTH,
+} from 'src/common/constants/validation.constant';
 
 export class CreateGenreDto {
-    @IsString()
-    @IsNotEmpty()
-    @Length(1, 50)
-    name: string;
+  @IsString()
+  @IsNotEmpty()
+  @Length(GENRE_NAME_MIN_LENGTH, GENRE_NAME_MAX_LENGTH)
+  name: string;
 
-    @IsString()
-    @IsOptional()
-    @Length(0, 255)
-    url?: string;
+  @IsNotEmpty()
+  @IsUrl()
+  @IsOptional()
+  url?: string;
 }

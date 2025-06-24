@@ -1,0 +1,43 @@
+doctype html 
+html 
+    head 
+        title Thư viện địa phương
+    body 
+        h1 Thư viện địa phương
+
+        a(href="/books") Sách
+        br
+        a(href="/authors") Tác giả
+        br
+        a(href="/genres") Thể loại
+        br
+        a(href="/bookinstances") Bản sao sách
+
+        hr
+
+        a(href="/authors/create") Tạo mới tác giả
+        br
+        a(href="/genres/create") Tạo mới thể loại
+        br
+        a(href="/books/create") Tạo mới sách
+        br
+        a(href="/bookinstances/create") Tạo mới bản sao sách
+
+        hr
+
+        
+        a(href="?lang=en") Tiếng Anh
+        |  | 
+        a(href="?lang=vi") Tiếng Việt
+
+        h1 Sun Asterisk - Nguyễn Đức Nhân
+        p Chào mừng bạn đến với Sun Asterisk - Nguyễn Đức Nhân
+        h2 Nội dung
+        p Tình trạng thư viện của chúng tôi:
+
+        ul
+            li Sách: #{book_count}
+            li Bản sao: #{book_instance_count}
+            li Tất cả các bản sao có sẵn: #{book_instance_available_count}
+            li Tác giả: #{author_count}
+            li Thể loại: #{genre_count}
