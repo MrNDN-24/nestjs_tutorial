@@ -5,7 +5,7 @@ import { Author } from './modules/author/entities/author.entity';
 import { Genre } from './modules/genre/entities/genre.entity';
 import { BookInstance } from './modules/bookInstance/entities/bookInstance.entity';
 import { Repository } from 'typeorm';
-import { BookStatus } from './common/enums/global.enum';
+import { BookStatus } from './common/enums/global.emun';
 @Injectable()
 export class AppService {
   constructor(

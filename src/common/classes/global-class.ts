@@ -1,9 +1,8 @@
 export class ResponseData<D> {
   data: D | D[];
-
+  statusCode: number;
   message: string;
   error?: any;
-  statusCode: number;
 
   constructor(
     data: D | D[],

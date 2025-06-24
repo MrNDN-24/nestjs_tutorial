@@ -1,0 +1,22 @@
+link(rel="stylesheet", href="/styles/style.css") 
+
+h2 Danh sách bản sao sách
+ul.ul-value
+    each instance in bookInstances
+        li
+        strong Imprint: 
+        span.label-value #{instance.imprint}
+        br
+        strong Trạng thái: 
+        span.label-value #{instance.status}
+        br
+        strong Hạn trả:
+        span.label-value #{instance.due_back}
+        br
+        strong Sách gốc:
+        span.label-value
+        if instance.book 
+            | #{instance.book.title}
+        else 
+            | Không có
+        hr

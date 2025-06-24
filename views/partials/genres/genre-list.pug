@@ -1,0 +1,22 @@
+link(rel="stylesheet", href="/styles/style.css") 
+
+h2 Danh sách thể loại
+ul.ul-value
+    each genre in genres
+        li
+        strong Tên thể loại: 
+        span.label-value #{genre.name}
+        br
+        strong Sách thuộc thể loại:
+        if genre.books && genre.books.length
+            span.label-value
+                each book, index in genre.books
+                    = book.title
+                    if index != genre.books.length - 1
+                        |, 
+        else
+            span.label-value Không có sách nào
+
+        hr
+
+

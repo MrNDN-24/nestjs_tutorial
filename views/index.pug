@@ -1,43 +1,45 @@
-doctype html 
-html 
-    head 
+doctype html
+html
+    head
         title Thư viện địa phương
-    body 
-        h1 Thư viện địa phương
+        link(rel="stylesheet", href="/styles/style.css") 
+        script(src="https://code.jquery.com/jquery-3.6.0.min.js")
+        mixin navLink(text, url)
+            label.nav-link(data-url=url)= text
+            br
+    body
+        .container-flex
+            .sidebar
+                h2 Thư viện MrNDN
 
-        a(href="/books") Sách
-        br
-        a(href="/authors") Tác giả
-        br
-        a(href="/genres") Thể loại
-        br
-        a(href="/bookinstances") Bản sao sách
+                +navLink('Danh sách sách', '/books/partial')
+                +navLink('Danh sách tác giả', '/authors/partial')
+                +navLink('Danh sách thể loại', '/genres/partial')
+                +navLink('Danh sách bản sao', '/bookInstances/partial')
 
-        hr
+                hr
 
-        a(href="/authors/create") Tạo mới tác giả
-        br
-        a(href="/genres/create") Tạo mới thể loại
-        br
-        a(href="/books/create") Tạo mới sách
-        br
-        a(href="/bookinstances/create") Tạo mới bản sao sách
+                +navLink('Thêm mới sách', '')
+                +navLink('Thêm mới tác giả', '')
+                +navLink('Thêm mới thể', '')
+                +navLink('Thêm mới bản sao sách', '')
 
-        hr
+                hr
+            #content
+                p Chào mừng đến với hệ thống thư viện!
 
-        
-        a(href="?lang=en") Tiếng Anh
-        |  | 
-        a(href="?lang=vi") Tiếng Việt
+            script.
+                $('.nav-link').click(function () {
+                    const url = $(this).data('url');
+                    if (url) {
+                    $('#content').load(url, function (response, status, xhr) {
+                        if (status === 'error') {
+                        alert('Lỗi khi tải nội dung: ' + xhr.status + ' ' + xhr.statusText);
+                        }
+                    });
+                    } else {
+                    alert('Chức năng đang phát triển!');
+                    }
+                });
 
-        h1 Sun Asterisk - Nguyễn Đức Nhân
-        p Chào mừng bạn đến với Sun Asterisk - Nguyễn Đức Nhân
-        h2 Nội dung
-        p Tình trạng thư viện của chúng tôi:
 
-        ul
-            li Sách: #{book_count}
-            li Bản sao: #{book_instance_count}
-            li Tất cả các bản sao có sẵn: #{book_instance_available_count}
-            li Tác giả: #{author_count}
-            li Thể loại: #{genre_count}
