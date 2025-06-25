@@ -8,21 +8,24 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Book } from './entities/book.entity';
 import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
 import { Author } from '../author/entities/author.entity';
 import { Genre } from '../genre/entities/genre.entity';
-import { UpdateBookDto } from './dto/update-book.dto';
+import { BookSerializer } from './serializers/book.serializer';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class BookService {
   constructor(@InjectRepository(Book) private bookRepo: Repository<Book>) {}
 
-  async findAll(): Promise<Book[]> {
+  async findAll(): Promise<BookSerializer[]> {
     try {
-      return await this.bookRepo.find({
+      const books = await this.bookRepo.find({
         relations: ['author', 'bookInstances', 'genres'],
-        order: {
-          title: 'ASC',
-        },
+        order: { title: 'ASC' },
+      });
+      return plainToInstance(BookSerializer, books, {
+        excludeExtraneousValues: true,
       });
     } catch (error) {
       throw new InternalServerErrorException(
@@ -31,34 +34,46 @@ export class BookService {
     }
   }
 
-  async findOneById(id: number): Promise<Book> {
-    const book = await this.bookRepo.findOne({
-      where: { id },
-      relations: ['author', 'genres', 'bookInstances'],
-    });
-    if (!book) {
-      throw new NotFoundException(`Book with id ${id} not found`);
+  async findOneById(id: number): Promise<BookSerializer> {
+    try {
+      const book = await this.bookRepo.findOne({
+        where: { id },
+        relations: ['author', 'genres', 'bookInstances'],
+      });
+      if (!book) {
+        throw new NotFoundException(`Book with id ${id} not found`);
+      }
+      return plainToInstance(BookSerializer, book, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to fetch book: ${error.message}`,
+      );
     }
-    return book;
   }
 
-  async create(createDto: CreateBookDto): Promise<Book> {
+  async create(data: CreateBookDto): Promise<BookSerializer> {
     try {
       const author = await this.bookRepo.manager.findOne(Author, {
-        where: { id: createDto.authorId },
+        where: { id: data.authorId },
       });
       if (!author) {
         throw new NotFoundException(
-          `Author with id ${createDto.authorId} not found`,
+          `Author with id ${data.authorId} not found`,
         );
       }
 
       const genres = await this.bookRepo.manager.find(Genre, {
-        where: { id: In(createDto.genreIds ?? []) },
+        where: { id: In(data.genreIds ?? []) },
       });
 
-      const book = this.bookRepo.create({ ...createDto, author, genres });
-      return await this.bookRepo.save(book);
+      const book = this.bookRepo.create({ ...data, author, genres });
+      const saved = await this.bookRepo.save(book);
+
+      return plainToInstance(BookSerializer, saved, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       throw new BadRequestException(
         `Invalid data for book creation: ${error.message}`,
@@ -66,44 +81,59 @@ export class BookService {
     }
   }
 
-  async update(updateDto: UpdateBookDto, id: number): Promise<Book> {
-    const book = await this.findOneById(id);
+  async update(data: UpdateBookDto, id: number): Promise<BookSerializer> {
+    const book = await this.bookRepo.findOne({
+      where: { id },
+      relations: ['author', 'genres'],
+    });
+    if (!book) {
+      throw new NotFoundException(`Book with id ${id} not found`);
+    }
+
     try {
       Object.assign(book, {
-        title: updateDto.title ?? book.title,
-        summary: updateDto.summary ?? book.summary,
-        url: updateDto.url ?? book.url,
+        title: data.title ?? book.title,
+        summary: data.summary ?? book.summary,
+        url: data.url ?? book.url,
       });
 
-      if (updateDto.authorId) {
+      if (data.authorId) {
         const author = await this.bookRepo.manager.findOne(Author, {
-          where: { id: updateDto.authorId },
+          where: { id: data.authorId },
         });
         if (!author) {
           throw new NotFoundException(
-            `Author with id ${updateDto.authorId} not found`,
+            `Author with id ${data.authorId} not found`,
           );
         }
         book.author = author;
       }
 
-      if (updateDto.genreIds && updateDto.genreIds.length > 0) {
+      if (data.genreIds && data.genreIds.length > 0) {
         const genres = await this.bookRepo.manager.find(Genre, {
-          where: { id: In(updateDto.genreIds) },
+          where: { id: In(data.genreIds) },
         });
         book.genres = genres;
       }
 
-      return await this.bookRepo.save(book);
+      const saved = await this.bookRepo.save(book);
+
+      return plainToInstance(BookSerializer, saved, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       throw new BadRequestException(`Invalid update data: ${error.message}`);
     }
   }
 
   async delete(id: number): Promise<boolean> {
-    const book = await this.findOneById(id);
+    const book = await this.bookRepo.findOneBy({ id });
+    if (!book) {
+      throw new NotFoundException(`Book with id ${id} not found`);
+    }
+
     try {
-      await this.bookRepo.delete(book.id);
+      await this.bookRepo.delete(id);
       return true;
     } catch (error) {
       throw new InternalServerErrorException(
@@ -112,3 +142,4 @@ export class BookService {
     }
   }
 }
+

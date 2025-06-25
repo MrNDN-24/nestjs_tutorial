@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 import { Genre } from './entities/genre.entity';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
+import { GenreSerializer } from './serializers/genre.serializer';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class GenreService {
@@ -17,22 +19,25 @@ export class GenreService {
     private genreRepo: Repository<Genre>,
   ) {}
 
-  async create(genreData: CreateGenreDto): Promise<Genre> {
+  async create(data: CreateGenreDto): Promise<GenreSerializer> {
     try {
-      const genre = this.genreRepo.create(genreData);
-      return await this.genreRepo.save(genre);
+      const genre = this.genreRepo.create(data);
+      const saved = await this.genreRepo.save(genre);
+      return plainToInstance(GenreSerializer, saved, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       throw new BadRequestException(`Invalid data: ${error.message}`);
     }
   }
 
-  async findAll(): Promise<Genre[]> {
+  async findAll(): Promise<GenreSerializer[]> {
     try {
-      return await this.genreRepo.find({
-        relations: ['books'],
-        order: {
-          name: 'ASC',
-        },
+      const genres = await this.genreRepo.find({
+        order: { name: 'ASC' },
+      });
+      return plainToInstance(GenreSerializer, genres, {
+        excludeExtraneousValues: true,
       });
     } catch (error) {
       throw new InternalServerErrorException(
@@ -41,31 +46,50 @@ export class GenreService {
     }
   }
 
-  async findOneById(id: number): Promise<Genre> {
-    const genre = await this.genreRepo.findOne({
-      where: { id },
-      relations: ['books'],
-    });
+  async findOneById(id: number): Promise<GenreSerializer> {
+    try {
+      const genre = await this.genreRepo.findOne({
+        where: { id },
+      });
+      if (!genre) {
+        throw new NotFoundException(`Genre with id ${id} not found`);
+      }
+
+      return plainToInstance(GenreSerializer, genre, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to fetch genre: ${error.message}`,
+      );
+    }
+  }
+
+  async update(data: UpdateGenreDto, id: number): Promise<GenreSerializer> {
+    const genre = await this.genreRepo.findOneBy({ id });
     if (!genre) {
       throw new NotFoundException(`Genre with id ${id} not found`);
     }
-    return genre;
-  }
 
-  async update(genreData: UpdateGenreDto, id: number): Promise<Genre> {
-    const genre = await this.findOneById(id);
     try {
-      const genreUpdated = this.genreRepo.merge(genre, genreData);
-      return await this.genreRepo.save(genreUpdated);
+      const updated = this.genreRepo.merge(genre, data);
+      const saved = await this.genreRepo.save(updated);
+      return plainToInstance(GenreSerializer, saved, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       throw new BadRequestException(`Invalid update data: ${error.message}`);
     }
   }
 
   async delete(id: number): Promise<boolean> {
-    const genre = await this.findOneById(id);
+    const genre = await this.genreRepo.findOneBy({ id });
+    if (!genre) {
+      throw new NotFoundException(`Genre with id ${id} not found`);
+    }
+
     try {
-      await this.genreRepo.delete(genre.id);
+      await this.genreRepo.delete(id);
       return true;
     } catch (error) {
       throw new InternalServerErrorException(
@@ -74,3 +98,4 @@ export class GenreService {
     }
   }
 }
+

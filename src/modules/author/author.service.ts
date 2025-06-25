@@ -9,6 +9,8 @@ import { Repository } from 'typeorm';
 import { Author } from './entities/author.entity';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-autor.dto';
+import { AuthorSerializer } from './serializers/author.serializer';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AuthorService {
@@ -17,22 +19,26 @@ export class AuthorService {
     private authorRepo: Repository<Author>,
   ) {}
 
-  async create(authorData: CreateAuthorDto): Promise<Author> {
+  async create(data: CreateAuthorDto): Promise<AuthorSerializer> {
     try {
-      const author = this.authorRepo.create(authorData);
-      return await this.authorRepo.save(author);
+      const author = this.authorRepo.create(data);
+      const saved = await this.authorRepo.save(author);
+      return plainToInstance(AuthorSerializer, saved, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       throw new BadRequestException(`Invalid data: ${error.message}`);
     }
   }
 
-  async findAll(): Promise<Author[]> {
+  async findAll(): Promise<AuthorSerializer[]> {
     try {
-      return await this.authorRepo.find({
-        relations: ['books'], 
-        order: {
-          name: 'ASC',
-        },
+      const authors = await this.authorRepo.find({
+        relations: ['books'],
+        order: { name: 'ASC' },
+      });
+      return plainToInstance(AuthorSerializer, authors, {
+        excludeExtraneousValues: true,
       });
     } catch (error) {
       throw new InternalServerErrorException(
@@ -41,33 +47,50 @@ export class AuthorService {
     }
   }
 
-  async findOneById(id: number): Promise<Author> {
-    const author = await this.authorRepo.findOne({
-      where: { id },
-      relations: ['books'], 
-    });
+  async findOneById(id: number): Promise<AuthorSerializer> {
+    try {
+      const author = await this.authorRepo.findOne({
+        where: { id },
+        relations: ['books'],
+      });
+      if (!author) {
+        throw new NotFoundException(`Author with id ${id} not found`);
+      }
+      return plainToInstance(AuthorSerializer, author, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to fetch author: ${error.message}`,
+      );
+    }
+  }
 
+  async update(data: UpdateAuthorDto, id: number): Promise<AuthorSerializer> {
+    const author = await this.authorRepo.findOneBy({ id });
     if (!author) {
       throw new NotFoundException(`Author with id ${id} not found`);
     }
 
-    return author;
-  }
-
-  async update(authorData: UpdateAuthorDto, id: number): Promise<Author> {
-    const author = await this.findOneById(id);
     try {
-      const updatedAuthor = this.authorRepo.merge(author, authorData);
-      return await this.authorRepo.save(updatedAuthor);
+      const updated = this.authorRepo.merge(author, data);
+      const saved = await this.authorRepo.save(updated);
+      return plainToInstance(AuthorSerializer, saved, {
+        excludeExtraneousValues: true,
+      });
     } catch (error) {
       throw new BadRequestException(`Invalid update data: ${error.message}`);
     }
   }
 
   async delete(id: number): Promise<boolean> {
-    const author = await this.findOneById(id);
+    const author = await this.authorRepo.findOneBy({ id });
+    if (!author) {
+      throw new NotFoundException(`Author with id ${id} not found`);
+    }
+
     try {
-      await this.authorRepo.delete(author.id);
+      await this.authorRepo.delete(id);
       return true;
     } catch (error) {
       throw new InternalServerErrorException(
@@ -76,3 +99,4 @@ export class AuthorService {
     }
   }
 }
+

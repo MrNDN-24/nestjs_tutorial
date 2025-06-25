@@ -1,0 +1,33 @@
+link(rel="stylesheet", href="/styles/style.css") 
+
+h2 Danh sách tác giả
+ul.ul-value
+    each author in authors
+        li
+        strong Tên tác giả:
+        span.label-value  #{author.name}
+        br
+        strong Họ: 
+        span.label-value  #{author.family_name}
+        br
+        strong Tên: 
+        span.label-value  #{author.first_name}
+        br
+        strong Ngày sinh: 
+        span.label-value  #{author.date_of_birth}
+        br
+        strong Ngày mất: 
+        span.label-value  #{author.date_of_death}
+        br
+        strong Sách đã viết:
+        if author.books && author.books.length
+            span.label-value 
+                each book, index in author.books
+                    = book.title
+                    if index != author.books.length - 1
+                        |, 
+        else
+            span.label-value  Không có sách nào
+        hr
+
+
