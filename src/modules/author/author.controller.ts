@@ -28,6 +28,13 @@ export class AuthorController {
     return { authors };
   }
 
+  @Get('partial/:id')
+  @Render('partials/authors/author-detail')
+  async findOneByIdView(@Param('id', ParseIntPipe) id: number) {
+    const author = await this.authorService.findOneById(id);
+    return { author };
+  }
+
   // API
   @Post()
   async create(

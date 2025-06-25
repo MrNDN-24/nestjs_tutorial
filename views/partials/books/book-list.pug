@@ -3,32 +3,33 @@ link(rel="stylesheet", href="/styles/style.css")
 h2 Danh sách sách
 ul.ul-value
     each book in books
-        li
-        strong Tên sách:
-        span.label-value #{book.title}
-        br
-        strong Tác giả:
-        span.label-value
-        if book.author
-            | #{book.author.name}
-        else
-            | Không có
-        br
-        strong Thể loại:
-        span.label-value
-        if book.genres && book.genres.length
-            | 
-            each genre, index in book.genres
-                = genre.name
-                if index != book.genres.length - 1
-                    |, 
-        else
-            | Không có
-        br
-        strong Số bản sao:
-        span.label-value
-        if book.bookInstances
-            | #{book.bookInstances.length}
-        else
-            | 0
-        hr
+        li.book-item(data-id=book.id)
+            strong Tên sách:
+            span.label-value #{book.title}
+            br
+            strong Tác giả:
+            span.label-value
+            if book.author
+                | #{book.author.name}
+            else
+                | Không có
+            br
+            strong Thể loại:
+            span.label-value
+            if book.genres && book.genres.length
+                | 
+                each genre, index in book.genres
+                    = genre.name
+                    if index != book.genres.length - 1
+                        |, 
+            else
+                | Không có
+            br
+            strong Số bản sao:
+            span.label-value
+            if book.bookInstances
+                | #{book.bookInstances.length}
+            else
+                | 0
+            br
+            button.btn-detail(data-id=book.id) Xem chi tiết

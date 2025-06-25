@@ -1,0 +1,61 @@
+link(rel="stylesheet", href="/styles/style.css")
+
+button.back-btn ← Quay lại
+h2 Chi tiết sách
+
+.book-detail(data-id=book.id)
+    strong Tên sách:
+    span.label-value= book.title
+    br
+
+    strong Tác giả:
+    span.label-value
+    if book.author
+        = book.author.name
+    else
+        | Không có
+    br
+
+    strong Tóm tắt:
+    span.label-value= book.summary || 'Không có'
+    br
+
+    strong ISBN:
+    span.label-value= book.isbn
+    br
+
+    strong URL:
+    if book.url
+        a.label-value(href=book.url target="_blank")= book.url
+    else
+        span.label-value Không có
+    br
+
+    strong Thể loại:
+    span.label-value
+    if book.genres && book.genres.length
+        each genre, index in book.genres
+            = genre.name
+            if index != book.genres.length - 1
+                |, 
+    else
+        | Không có
+    br
+
+    strong Số bản sao:
+    span.label-value
+    if book.bookInstances
+        | #{book.bookInstances.length}
+    else
+        | 0
+    br
+
+    if book.bookInstances && book.bookInstances.length
+        ul.ul-value
+            each instance in book.bookInstances
+                li
+                    | Ấn bản: #{instance.imprint}, 
+                    | Tình trạng: #{instance.status}, 
+                    | Ngày trả: #{instance.due_back}
+    else
+        p(style="margin-left: 1rem") Không có ấn bản nào

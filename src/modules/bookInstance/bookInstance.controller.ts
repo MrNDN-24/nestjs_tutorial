@@ -27,6 +27,13 @@ export class BookInstanceController {
     return { bookInstances };
   }
 
+  @Get('partial/:id')
+  @Render('partials/bookInstances/bookInstance-detail')
+  async findOneByIdView(@Param('id', ParseIntPipe) id: number) {
+    const instance = await this.bookInstanceService.findOneById(id);
+    return { instance };
+  }
+
   @Get()
   async findAll(): Promise<ResponseData<BookInstanceSerializer[]>> {
     const result = await this.bookInstanceService.findAll();

@@ -4,6 +4,8 @@ html
         title Thư viện địa phương
         link(rel="stylesheet", href="/styles/style.css") 
         script(src="https://code.jquery.com/jquery-3.6.0.min.js")
+        script(src="/scripts/action-handler.js") 
+        script(src="/scripts/navigation-handler.js")
         mixin navLink(text, url)
             label.nav-link(data-url=url)= text
             br
@@ -28,18 +30,5 @@ html
             #content
                 p Chào mừng đến với hệ thống thư viện!
 
-            script.
-                $('.nav-link').click(function () {
-                    const url = $(this).data('url');
-                    if (url) {
-                    $('#content').load(url, function (response, status, xhr) {
-                        if (status === 'error') {
-                        alert('Lỗi khi tải nội dung: ' + xhr.status + ' ' + xhr.statusText);
-                        }
-                    });
-                    } else {
-                    alert('Chức năng đang phát triển!');
-                    }
-                });
 
 

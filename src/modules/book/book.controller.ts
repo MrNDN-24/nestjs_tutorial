@@ -28,6 +28,13 @@ export class BookController {
     return { books };
   }
 
+  @Get('partial/:id')
+  @Render('partials/books/book-detail')
+  async findOneByIdView(@Param('id', ParseIntPipe) id: number) {
+    const book = await this.bookService.findOneById(id);
+    return { book };
+  }
+  
   // API
   @Get()
   async findAll(): Promise<ResponseData<BookSerializer[]>> {

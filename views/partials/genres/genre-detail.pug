@@ -1,0 +1,23 @@
+link(rel="stylesheet", href="/styles/style.css")
+
+button.back-btn ← Quay lại
+h2 Chi tiết thể loại
+
+.genre-detail(data-id=genre.id)
+    strong Tên thể loại:
+    span.label-value= genre.name
+    br
+
+    strong Sách thuộc thể loại:
+    if genre.books && genre.books.length
+        ul.ul-value
+            each book in genre.books
+                li
+                    a(href=`/books/${book.id}`)= book.title
+                    if book.author
+                        |  – Tác giả: #{book.author.name}
+                    else
+                        |  – Tác giả: Không rõ
+    else
+        span.label-value Không có sách nào
+
