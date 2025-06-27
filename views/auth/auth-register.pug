@@ -1,0 +1,26 @@
+form#register-form
+    h2 Đăng ký
+    label(for="username") Tên đăng nhập:
+    input(type="text", name="username", required)
+    br
+    label(for="password") Mật khẩu:
+    input(type="password", name="password", required)
+    br
+    button(type="submit") Đăng ký
+
+    script.
+        $('#register-form').submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '/users/registerView',
+                data: $(this).serialize(),
+                success: function (res) {
+                    alert('Đăng ký thành công, vui lòng đăng nhập!');
+                    $('#content').load('/auth/loginView-form');
+                },
+                error: function (err) {
+                    alert(err.responseJSON.message || 'Đăng ký thất bại');
+                }
+            });
+        });

@@ -9,6 +9,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   JoinTable,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -36,7 +37,14 @@ export class Book {
   })
   bookInstances: BookInstance[];
 
-  @ManyToMany(() => Genre, (genre) => genre.books, { nullable: true })
-  @JoinTable()
+  @ManyToMany(() => Genre, (genre) => genre.books)
+  @JoinTable({
+    name: 'book_genre',
+    joinColumn: { name: 'book_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'genre_id', referencedColumnName: 'id' },
+  })
   genres?: Genre[];
+  
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

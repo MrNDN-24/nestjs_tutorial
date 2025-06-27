@@ -9,8 +9,8 @@ import { Repository } from 'typeorm';
 import { Author } from './entities/author.entity';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-autor.dto';
-import { AuthorSerializer } from './serializers/author.serializer';
 import { plainToInstance } from 'class-transformer';
+import { AuthorSerializer } from './serializers/author.serializer';
 
 @Injectable()
 export class AuthorService {
@@ -34,8 +34,8 @@ export class AuthorService {
   async findAll(): Promise<AuthorSerializer[]> {
     try {
       const authors = await this.authorRepo.find({
-        relations: ['books'],
-        order: { name: 'ASC' },
+        relations: ['books', 'books.genres', 'books.bookInstances'],
+        order: { first_name: 'ASC' },
       });
       return plainToInstance(AuthorSerializer, authors, {
         excludeExtraneousValues: true,
@@ -51,7 +51,7 @@ export class AuthorService {
     try {
       const author = await this.authorRepo.findOne({
         where: { id },
-        relations: ['books'],
+        relations: ['books', 'books.genres', 'books.bookInstances'],
       });
       if (!author) {
         throw new NotFoundException(`Author with id ${id} not found`);
@@ -89,8 +89,19 @@ export class AuthorService {
       throw new NotFoundException(`Author with id ${id} not found`);
     }
 
+    const authorWithBooks = await this.authorRepo.findOne({
+      where: { id },
+      relations: ['books'],
+    });
+
+    if (authorWithBooks.books?.length) {
+      throw new BadRequestException(
+        `Cannot delete author with id ${id} because they have associated books`,
+      );
+    }
+
     try {
-      await this.authorRepo.delete(id);
+      await this.authorRepo.softDelete(id);
       return true;
     } catch (error) {
       throw new InternalServerErrorException(

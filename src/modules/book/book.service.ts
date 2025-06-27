@@ -7,10 +7,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Book } from './entities/book.entity';
-import { CreateBookDto } from './dto/create-book.dto';
-import { UpdateBookDto } from './dto/update-book.dto';
 import { Author } from '../author/entities/author.entity';
 import { Genre } from '../genre/entities/genre.entity';
+import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
 import { BookSerializer } from './serializers/book.serializer';
 import { plainToInstance } from 'class-transformer';
 
@@ -35,22 +35,14 @@ export class BookService {
   }
 
   async findOneById(id: number): Promise<BookSerializer> {
-    try {
-      const book = await this.bookRepo.findOne({
-        where: { id },
-        relations: ['author', 'genres', 'bookInstances'],
-      });
-      if (!book) {
-        throw new NotFoundException(`Book with id ${id} not found`);
-      }
-      return plainToInstance(BookSerializer, book, {
-        excludeExtraneousValues: true,
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(
-        `Failed to fetch book: ${error.message}`,
-      );
-    }
+    const book = await this.bookRepo.findOne({
+      where: { id },
+      relations: ['author', 'genres', 'bookInstances'],
+    });
+    if (!book) throw new NotFoundException(`Book with id ${id} not found`);
+    return plainToInstance(BookSerializer, book, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async create(data: CreateBookDto): Promise<BookSerializer> {
@@ -65,12 +57,11 @@ export class BookService {
       }
 
       const genres = await this.bookRepo.manager.find(Genre, {
-        where: { id: In(data.genreIds ?? []) },
+        where: { id: In(data.genreIds || []) },
       });
 
       const book = this.bookRepo.create({ ...data, author, genres });
       const saved = await this.bookRepo.save(book);
-
       return plainToInstance(BookSerializer, saved, {
         excludeExtraneousValues: true,
       });
@@ -117,7 +108,6 @@ export class BookService {
       }
 
       const saved = await this.bookRepo.save(book);
-
       return plainToInstance(BookSerializer, saved, {
         excludeExtraneousValues: true,
       });
@@ -127,13 +117,20 @@ export class BookService {
   }
 
   async delete(id: number): Promise<boolean> {
-    const book = await this.bookRepo.findOneBy({ id });
-    if (!book) {
-      throw new NotFoundException(`Book with id ${id} not found`);
+    const book = await this.bookRepo.findOne({
+      where: { id },
+      relations: ['bookInstances'],
+    });
+    if (!book) throw new NotFoundException(`Book with id ${id} not found`);
+
+    if (book.bookInstances?.length > 0) {
+      throw new BadRequestException(
+        'Cannot delete book: it still has associated book instances',
+      );
     }
 
     try {
-      await this.bookRepo.delete(id);
+      await this.bookRepo.softDelete(id);
       return true;
     } catch (error) {
       throw new InternalServerErrorException(

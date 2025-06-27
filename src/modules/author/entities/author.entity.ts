@@ -1,5 +1,5 @@
 import { Book } from '@/modules/book/entities/book.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, DeleteDateColumn } from 'typeorm';
 
 @Entity()
 export class Author {
@@ -26,4 +26,8 @@ export class Author {
 
   @OneToMany(() => Book, (book) => book.author)
   books: Book[];
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }
+

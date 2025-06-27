@@ -10,7 +10,6 @@ export class CreateGenreDto {
   @Length(GENRE_NAME_MIN_LENGTH, GENRE_NAME_MAX_LENGTH)
   name: string;
 
-  @IsNotEmpty()
   @IsUrl()
   @IsOptional()
   url?: string;

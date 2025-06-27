@@ -1,16 +1,16 @@
-import { IsString, IsDateString, IsNotEmpty, IsInt, IsUrl, IsOptional } from 'class-validator';
+import { IsString, IsDateString, IsNotEmpty, IsInt, IsUrl, IsOptional, IsEnum } from 'class-validator';
+import { BookStatus } from '@/common/enums/global.emun';
 
 export class CreateBookInstanceDto {
   @IsString()
   @IsNotEmpty()
   imprint: string;
 
-  @IsString()
-  @IsNotEmpty()
-  status: string;
+  @IsEnum(BookStatus)
+  status: BookStatus;
 
   @IsDateString()
-  due_back: Date;
+  due_back: string;
 
   @IsString()
   @IsUrl()

@@ -13,9 +13,15 @@ import { AuthorService } from './author.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-autor.dto';
 import { ResponseData } from '@/common/classes/global-class';
-import { HttpStatus, HttpMessage } from '@/common/enums/global.emun';
+import { HttpMessage, HttpStatus } from '@/common/enums/global.emun';
 import { AuthorSerializer } from './serializers/author.serializer';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Role } from '../auth/role.decorator';
+import { UserRole } from '@/common/enums/global.emun';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('authors')
 export class AuthorController {
   constructor(private readonly authorService: AuthorService) {}
@@ -33,6 +39,47 @@ export class AuthorController {
   async findOneByIdView(@Param('id', ParseIntPipe) id: number) {
     const author = await this.authorService.findOneById(id);
     return { author };
+  }
+
+  @Role(UserRole.ADMIN)
+  @Post('form/add')
+  @Render('partials/authors/author-action')
+  async createView(@Body() data: CreateAuthorDto) {
+    const author = await this.authorService.create(data);
+    return { author };
+  }
+
+  @Role(UserRole.ADMIN)
+  @Get('form/addnew')
+  @Render('partials/authors/author-action')
+  getCreateForm() {
+    return { author: null };
+  }
+
+  @Role(UserRole.ADMIN)
+  @Put('form/edit/:id')
+  @Render('partials/authors/author-action')
+  async updateView(
+    @Body() data: CreateAuthorDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const author = await this.authorService.update(data, id);
+    return { author };
+  }
+
+  @Role(UserRole.ADMIN)
+  @Get('form/:id/edit')
+  @Render('partials/authors/author-action')
+  async getUpdateForm(@Param('id', ParseIntPipe) id: number) {
+    const author = await this.authorService.findOneById(id);
+    return { author };
+  }
+
+  @Role(UserRole.ADMIN)
+  @Delete('delete/:id')
+  async deleteView(@Param('id', ParseIntPipe) id: number) {
+    await this.authorService.delete(id);
+    return { success: true };
   }
 
   // API

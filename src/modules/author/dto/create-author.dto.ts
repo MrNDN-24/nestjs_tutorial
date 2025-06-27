@@ -27,11 +27,11 @@ export class CreateAuthorDto {
   family_name: string;
 
   @IsDateString()
-  date_of_birth: Date;
+  date_of_birth: string;
 
   @IsOptional()
   @IsDateString()
-  date_of_death?: Date;
+  date_of_death?: string;
 
   @IsString()
   @IsOptional()

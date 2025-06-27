@@ -1,0 +1,36 @@
+h2= book && book.id ? 'Cập nhật sách' : 'Thêm mới sách'
+
+form#book-form
+    input(type="hidden" id="book-id", value=(book && book.id) || '')
+
+    label(for="title") Tựa sách:
+    input(type="text" name="title", value=(book && book.title) || '', required)
+
+    label(for="summary") Tóm tắt:
+    textarea(name="summary")= (book && book.summary) || '' 
+
+    label(for="isbn") Mã ISBN:
+    input(type="text" name="isbn", value=(book && book.isbn) || '', required)
+
+    label(for="url") Đường dẫn:
+    input(type="text" name="url", value=(book && book.url) || '', required)
+
+    label(for="authorId") Tác giả:
+    select(name="authorId" id="author-select", required)
+        option(value="") -- Chọn tác giả --
+        each author in authors
+            option(
+                value=author.id,
+                selected=(book && book.author && (book.author.id === author.id || book.author.toString() === author.id.toString()))
+            )= author.name
+
+    label(for="genreIds") Thể loại:
+    select(name="genreIds[]" id="genre-select" multiple="multiple")
+        each genre in genres
+            option(
+                value=genre.id,
+                selected=(book && book.genres && book.genres.some(g => g.id === genre.id || g.toString() === genre.id.toString()))
+            )= genre.name
+
+    button.btn-new(type="button")= (book && book.id) ? 'Cập nhật' : 'Thêm mới' 
+    button.back-btn(type="button") Hủy

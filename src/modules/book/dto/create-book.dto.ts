@@ -1,7 +1,6 @@
 import {
   IsNotEmpty,
   IsString,
-  IsISBN,
   IsUrl,
   IsArray,
   IsNumber,
@@ -16,8 +15,7 @@ export class CreateBookDto {
   @IsString()
   summary: string;
 
-  @IsNotEmpty()
-  @IsISBN()
+  @IsString()
   isbn: string;
 
   @IsString()

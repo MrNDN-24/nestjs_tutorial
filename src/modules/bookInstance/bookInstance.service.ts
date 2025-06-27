@@ -37,22 +37,15 @@ export class BookInstanceService {
   }
 
   async findOneById(id: number): Promise<BookInstanceSerializer> {
-    try {
-      const instance = await this.bookInstanceRepo.findOne({
-        where: { id },
-        relations: ['book'],
-      });
-      if (!instance) {
-        throw new NotFoundException(`BookInstance with id ${id} not found`);
-      }
-      return plainToInstance(BookInstanceSerializer, instance, {
-        excludeExtraneousValues: true,
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(
-        `Failed to fetch book instance: ${error.message}`,
-      );
-    }
+    const instance = await this.bookInstanceRepo.findOne({
+      where: { id },
+      relations: ['book'],
+    });
+    if (!instance)
+      throw new NotFoundException(`BookInstance with id ${id} not found`);
+    return plainToInstance(BookInstanceSerializer, instance, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async create(data: CreateBookInstanceDto): Promise<BookInstanceSerializer> {
@@ -107,12 +100,19 @@ export class BookInstanceService {
 
   async delete(id: number): Promise<boolean> {
     const instance = await this.bookInstanceRepo.findOneBy({ id });
+
     if (!instance) {
-      throw new NotFoundException(`BookInstance with id ${id} not found`);
+      throw new NotFoundException(`Book instance with id ${id} not found`);
+    }
+
+    if (instance.status !== 'Available') {
+      throw new BadRequestException(
+        'Cannot delete book instance: status must be "Available"',
+      );
     }
 
     try {
-      await this.bookInstanceRepo.delete(id);
+      await this.bookInstanceRepo.softDelete(id);
       return true;
     } catch (error) {
       throw new InternalServerErrorException(

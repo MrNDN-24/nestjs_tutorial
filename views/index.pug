@@ -2,9 +2,12 @@ doctype html
 html
     head
         title Thư viện địa phương
-        link(rel="stylesheet", href="/styles/style.css") 
+        link(rel="stylesheet" href="/styles/style.css") 
+        link(href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet")
         script(src="https://code.jquery.com/jquery-3.6.0.min.js")
+        script(src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js")
         script(src="/scripts/action-handler.js") 
+        script(src="/scripts/form-handler.js")
         script(src="/scripts/navigation-handler.js")
         mixin navLink(text, url)
             label.nav-link(data-url=url)= text
@@ -13,7 +16,6 @@ html
         .container-flex
             .sidebar
                 h2 Thư viện MrNDN
-
                 +navLink('Danh sách sách', '/books/partial')
                 +navLink('Danh sách tác giả', '/authors/partial')
                 +navLink('Danh sách thể loại', '/genres/partial')
@@ -21,14 +23,17 @@ html
 
                 hr
 
-                +navLink('Thêm mới sách', '')
-                +navLink('Thêm mới tác giả', '')
-                +navLink('Thêm mới thể', '')
-                +navLink('Thêm mới bản sao sách', '')
+                +navLink('Thêm mới tác giả', '/authors/form/addnew')
+                +navLink('Thêm mới sách', '/books/form/addnew')
+                +navLink('Thêm mới thể loại', '/genres/form/addnew')
+                +navLink('Thêm mới bản sao sách', '/bookInstances/form/addnew')
 
                 hr
+                +navLink('Đăng ký', '/users/registerView-form')
+                +navLink('Đăng nhập', '/auth/loginView-form')
+                button#logout-btn Đăng xuất
+
+                hr
+
             #content
                 p Chào mừng đến với hệ thống thư viện!
-
-
-
