@@ -1,4 +1,5 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { BookSerializer } from '@/modules/book/serializers/book.serializer';
 
 export class GenreSerializer {
   @Expose()
@@ -9,4 +10,8 @@ export class GenreSerializer {
 
   @Expose()
   url: string;
+
+  @Expose()
+  @Type(() => BookSerializer) 
+  books?: BookSerializer[];
 }

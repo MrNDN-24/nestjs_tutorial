@@ -1,5 +1,5 @@
 import { Book } from '@/modules/book/entities/book.entity';
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn, DeleteDateColumn } from 'typeorm';
 
 @Entity()
 export class Genre {
@@ -14,4 +14,8 @@ export class Genre {
 
   @ManyToMany(() => Book, (book) => book.genres, { nullable: true })
   books?: Book[];
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }
+

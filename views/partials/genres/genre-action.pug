@@ -1,0 +1,13 @@
+h2= genre && genre.id ? 'Cập nhật thể loại' : 'Thêm mới thể loại'
+
+form#genre-form
+    input(type="hidden" name="id", value=(genre && genre.id) || '')
+
+    label(for="name") Tên thể loại:
+    input(type="text" name="name", value=(genre && genre.name) || '', required)
+
+    label(for="url") Đường dẫn:
+    input(type="text" name="url", value=(genre && genre.url) || '', required)
+
+    button.btn-new(type="button")= (genre && genre.id) ? 'Cập nhật' : 'Thêm mới' 
+    button.btn-cancel(type="button") Hủy

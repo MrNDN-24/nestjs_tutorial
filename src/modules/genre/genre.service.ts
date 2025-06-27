@@ -34,6 +34,7 @@ export class GenreService {
   async findAll(): Promise<GenreSerializer[]> {
     try {
       const genres = await this.genreRepo.find({
+        relations: ['books', 'books.author'],
         order: { name: 'ASC' },
       });
       return plainToInstance(GenreSerializer, genres, {
@@ -47,22 +48,16 @@ export class GenreService {
   }
 
   async findOneById(id: number): Promise<GenreSerializer> {
-    try {
-      const genre = await this.genreRepo.findOne({
-        where: { id },
-      });
-      if (!genre) {
-        throw new NotFoundException(`Genre with id ${id} not found`);
-      }
-
-      return plainToInstance(GenreSerializer, genre, {
-        excludeExtraneousValues: true,
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(
-        `Failed to fetch genre: ${error.message}`,
-      );
+    const genre = await this.genreRepo.findOne({
+      where: { id },
+      relations: ['books', 'books.author'],
+    });
+    if (!genre) {
+      throw new NotFoundException(`Genre with id ${id} not found`);
     }
+    return plainToInstance(GenreSerializer, genre, {
+      excludeExtraneousValues: true,
+    });
   }
 
   async update(data: UpdateGenreDto, id: number): Promise<GenreSerializer> {
@@ -83,13 +78,23 @@ export class GenreService {
   }
 
   async delete(id: number): Promise<boolean> {
-    const genre = await this.genreRepo.findOneBy({ id });
+    const genre = await this.genreRepo.findOne({
+      where: { id },
+      relations: ['books'],
+    });
+
     if (!genre) {
       throw new NotFoundException(`Genre with id ${id} not found`);
     }
 
+    if (genre.books?.length > 0) {
+      throw new BadRequestException(
+        'Cannot delete genre: it is still associated with books',
+      );
+    }
+
     try {
-      await this.genreRepo.delete(id);
+      await this.genreRepo.softDelete(id);
       return true;
     } catch (error) {
       throw new InternalServerErrorException(
@@ -98,4 +103,3 @@ export class GenreService {
     }
   }
 }
-

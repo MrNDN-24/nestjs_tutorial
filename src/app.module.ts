@@ -11,6 +11,8 @@ import { Book } from './modules/book/entities/book.entity';
 import { Author } from './modules/author/entities/author.entity';
 import { Genre } from './modules/genre/entities/genre.entity';
 import { BookInstance } from './modules/bookInstance/entities/bookInstance.entity';
+import { UserModule } from './modules/user/user.module';
+import { AuthModule } from './modules/auth/auth.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -21,6 +23,8 @@ import { BookInstance } from './modules/bookInstance/entities/bookInstance.entit
     GenreModule,
     BookModule,
     BookInstanceModule,
+    UserModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -14,11 +14,22 @@ import { ResponseData } from '@/common/classes/global-class';
 import { HttpStatus, HttpMessage } from '@/common/enums/global.emun';
 import { CreateBookInstanceDto } from './dto/create-bookInstance.dto';
 import { UpdateBookInstanceDto } from './dto/update-bookInstance.dto';
+import { BookService } from '../book/book.service';
+import { BookStatus } from '@/common/enums/global.emun';
 import { BookInstanceSerializer } from './serializers/bookInstance.serializer';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Role } from '../auth/role.decorator';
+import { UserRole } from '@/common/enums/global.emun';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('bookInstances')
 export class BookInstanceController {
-  constructor(private readonly bookInstanceService: BookInstanceService) {}
+  constructor(
+    private readonly bookInstanceService: BookInstanceService,
+    private readonly bookService: BookService,
+  ) {}
 
   @Get('partial')
   @Render('partials/bookInstances/bookInstance-list')
@@ -34,6 +45,54 @@ export class BookInstanceController {
     return { instance };
   }
 
+  @Role(UserRole.ADMIN)
+  @Post('form/add')
+  @Render('partials/bookInstances/bookInstance-action')
+  async createView(@Body() data: CreateBookInstanceDto) {
+    const instance = await this.bookInstanceService.create(data);
+    return this.getFormData(instance);
+  }
+
+  @Role(UserRole.ADMIN)
+  @Get('form/addnew')
+  @Render('partials/bookInstances/bookInstance-action')
+  async getCreateForm() {
+    return this.getFormData();
+  }
+
+  @Role(UserRole.ADMIN)
+  @Put('form/edit/:id')
+  @Render('partials/bookInstances/bookInstance-action')
+  async updateView(
+    @Body() data: CreateBookInstanceDto,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const instance = await this.bookInstanceService.update(id, data);
+    return this.getFormData(instance);
+  }
+
+  @Role(UserRole.ADMIN)
+  @Get('form/:id/edit')
+  @Render('partials/bookInstances/bookInstance-action')
+  async getUpdateForm(@Param('id', ParseIntPipe) id: number) {
+    const instance = await this.bookInstanceService.findOneById(id);
+    return this.getFormData(instance);
+  }
+
+  @Role(UserRole.ADMIN)
+  @Delete('delete/:id')
+  async deleteView(@Param('id', ParseIntPipe) id: number) {
+    await this.bookInstanceService.delete(id);
+    return { success: true };
+  }
+
+  private async getFormData(instance: any = null) {
+    const books = await this.bookService.findAll();
+    const statuses = Object.values(BookStatus);
+    return { instance, books, statuses };
+  }
+
+  // API
   @Get()
   async findAll(): Promise<ResponseData<BookInstanceSerializer[]>> {
     const result = await this.bookInstanceService.findAll();
@@ -77,4 +136,3 @@ export class BookInstanceController {
     return new ResponseData(result, HttpStatus.SUCCESS, HttpMessage.SUCCESS);
   }
 }
-

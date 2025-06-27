@@ -1,5 +1,5 @@
 import { Book } from '@/modules/book/entities/book.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, DeleteDateColumn } from 'typeorm';
 
 @Entity()
 export class BookInstance {
@@ -20,4 +20,8 @@ export class BookInstance {
 
   @ManyToOne(() => Book, (book) => book.bookInstances)
   book: Book;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }
+

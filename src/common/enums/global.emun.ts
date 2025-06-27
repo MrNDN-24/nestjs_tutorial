@@ -12,4 +12,8 @@ export enum BookStatus {
   RESERVED = 'Reserved',
   MAINTENANCE = 'Maintenance',
 }
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+}
 

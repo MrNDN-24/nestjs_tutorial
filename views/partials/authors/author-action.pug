@@ -1,0 +1,26 @@
+h2= author && author.id ? 'Cập nhật tác giả' : 'Thêm mới tác giả'
+
+form#author-form
+    input(type="hidden" name="id", value=(author && author.id) || '')
+
+    label(for="name") Tên tác giả:
+    input(type="text" name="name", value=(author && author.name) || '', required)
+
+    label(for="family_name") Họ:
+    input(type="text" name="family_name", value=(author && author.family_name) || '')
+
+    label(for="first_name") Tên:
+    input(type="text" name="first_name", value=(author && author.first_name) || '')
+
+    label(for="date_of_birth") Ngày sinh:
+    input(type="date" name="date_of_birth", value=(author && author.date_of_birth) || '')
+
+    label(for="date_of_death") Ngày mất:
+    input(type="date" name="date_of_death", value=(author && author.date_of_death) || '')
+
+    label(for="url") Đường dẫn tham khảo:
+    input(type="text" name="url", value=(author && author.url) || '', required)
+
+    button.btn-new(type="button")= (author && author.id) ? 'Cập nhật' : 'Thêm mới' 
+    button.btn-cancel(type="button") Hủy
+

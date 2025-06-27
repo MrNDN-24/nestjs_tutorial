@@ -1,0 +1,30 @@
+h2= instance && instance.id ? 'Cập nhật bản sao sách' : 'Thêm mới bản sao sách'
+
+form#bookInstance-form
+    input(type="hidden" name="id", value=(instance && instance.id) || '')
+
+    label(for="imprint") Bản in:
+    input(type="text" name="imprint", value=(instance && instance.imprint) || '', required)
+
+    label(for="status") Trạng thái:
+    select(name="status", required)
+        option(value="") -- Chọn trạng thái --
+        each s in statuses
+            option(value=s selected=(instance && instance.status === s))= s
+
+    label(for="due_back") Hạn trả:
+    input(type="date" name="due_back", value=(instance && instance.due_back) || '')
+
+    label(for="url") Đường dẫn:
+    input(type="text" name="url", value=(instance && instance.url) || '', required)
+
+    label(for="bookId") Thuộc sách:
+    select(name="bookId", required)
+        option(value="") -- Chọn sách --
+        each book in books
+            option(value=book.id selected=(instance && instance.book && instance.book.id === book.id))= book.title
+
+
+    button.btn-new(type="button")= (instance && instance.id) ? 'Cập nhật' : 'Thêm mới' 
+    button.btn-cancel(type="button") Hủy
+
