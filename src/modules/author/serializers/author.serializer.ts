@@ -27,4 +27,3 @@ export class AuthorSerializer {
   @Type(() => BookSerializer)
   books?: BookSerializer[];
 }
-

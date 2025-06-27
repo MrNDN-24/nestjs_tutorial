@@ -28,6 +28,13 @@ export class GenreController {
     return { genres };
   }
 
+  @Get('partial/:id')
+  @Render('partials/genres/genre-detail')
+  async findOneByIdView(@Param('id', ParseIntPipe) id: number) {
+    const genre = await this.genreService.findOneById(id);
+    return { genre };
+  }
+
   @Post()
   async create(
     @Body() data: CreateGenreDto,

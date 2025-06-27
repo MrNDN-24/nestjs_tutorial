@@ -1,0 +1,25 @@
+link(rel="stylesheet", href="/styles/style.css")
+
+button.back-btn ← Quay lại
+h2 Chi tiết bản sao sách
+
+.book-instance-detail(data-id=instance.id)
+    strong Imprint: 
+    span.label-value= instance.imprint
+    br
+
+    strong Trạng thái: 
+    span.label-value= instance.status
+    br
+
+    strong Hạn trả:
+    span.label-value= instance.due_back || 'Không có'
+    br
+
+    strong Sách gốc:
+    if instance.book
+        a.label-value(href=`/books/${instance.book.id}`)= instance.book.title
+    else 
+        span.label-value Không có
+    br
+

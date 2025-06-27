@@ -1,0 +1,49 @@
+link(rel="stylesheet", href="/styles/style.css") 
+
+button.back-btn ← Quay lại
+h2 Chi tiết tác giả
+
+.author-detail(data-id=author.id)
+    strong Tên tác giả:
+    span.label-value= author.name
+    br
+    strong Họ: 
+    span.label-value= author.family_name
+    br
+    strong Tên: 
+    span.label-value= author.first_name
+    br
+    strong Ngày sinh: 
+    span.label-value= author.date_of_birth
+    br
+    strong Ngày mất: 
+    span.label-value= author.date_of_death
+    br
+    strong Sách đã viết:
+    if author.books && author.books.length
+        ul.ul-value
+            each book in author.books
+                li
+                    a(href=`/books/${book.id}`)= book.title
+                    |  
+                    if book.genres && book.genres.length
+                        | (
+                        each genre, index in book.genres
+                            = genre.name
+                            if index != book.genres.length - 1
+                                |, 
+                        | )
+                    else
+                        | (Không rõ thể loại)
+                    
+                    if book.bookInstances && book.bookInstances.length
+                        ul
+                        each instance in book.bookInstances
+                            
+                            | Ấn bản: #{instance.imprint}, 
+                            | Tình trạng: #{instance.status}, 
+                            | Ngày trả: #{instance.due_back}
+                    else
+                        p(style="margin-left: 1rem") Không có ấn bản nào
+    else
+        span.label-value Không có sách nào

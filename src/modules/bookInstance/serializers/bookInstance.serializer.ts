@@ -21,4 +21,3 @@ export class BookInstanceSerializer {
   @Type(() => BookSerializer)
   book: BookSerializer;
 }
-

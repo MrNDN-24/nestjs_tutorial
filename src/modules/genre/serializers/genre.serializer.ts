@@ -10,4 +10,3 @@ export class GenreSerializer {
   @Expose()
   url: string;
 }
-

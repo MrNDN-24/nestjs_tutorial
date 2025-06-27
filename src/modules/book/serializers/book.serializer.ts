@@ -31,4 +31,3 @@ export class BookSerializer {
   @Type(() => BookInstanceSerializer)
   bookInstances?: BookInstanceSerializer[];
 }
-
